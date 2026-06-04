@@ -1,6 +1,9 @@
 from typing import Set
+from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+ENV_FILE = Path(__file__).resolve().parents[1] / ".env"
 
 
 class Settings(BaseSettings):
@@ -32,6 +35,22 @@ class Settings(BaseSettings):
     VALIDATE_CERTS: bool = True
     TEMPLATE_DIR: str = "email_templates"
 
+    # Gmail ingestion
+    GMAIL_API_BASE_URL: str = "https://gmail.googleapis.com/gmail/v1"
+    GMAIL_PUBSUB_TOPIC_NAME: str | None = None
+    GMAIL_WEBHOOK_TOKEN: str | None = None
+    GOOGLE_CLIENT_ID: str | None = None
+    GOOGLE_CLIENT_SECRET: str | None = None
+    GOOGLE_OAUTH_REDIRECT_URI: str = (
+        "http://localhost:8000/emails/gmail/oauth/callback"
+    )
+
+    # OpenAI email triage
+    OPENAI_API_KEY: str | None = None
+    OPENAI_API_BASE_URL: str = "https://api.openai.com/v1"
+    OPENAI_EMAIL_TRIAGE_MODEL: str = "gpt-5"
+    OPENAI_EMAIL_TRIAGE_ON_WEBHOOK: bool = False
+
     # Frontend
     FRONTEND_URL: str = "http://localhost:3000"
 
@@ -39,7 +58,7 @@ class Settings(BaseSettings):
     CORS_ORIGINS: Set[str]
 
     model_config = SettingsConfigDict(
-        env_file=".env", env_file_encoding="utf-8", extra="ignore"
+        env_file=ENV_FILE, env_file_encoding="utf-8", extra="ignore"
     )
 
 

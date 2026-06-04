@@ -4,6 +4,7 @@ from .schemas import UserCreate, UserRead, UserUpdate
 from .users import auth_backend, fastapi_users, AUTH_URL_PATH
 from fastapi.middleware.cors import CORSMiddleware
 from .utils import simple_generate_unique_route_id
+from app.routes.emails import router as emails_router
 from app.routes.items import router as items_router
 from app.config import settings
 
@@ -50,4 +51,5 @@ app.include_router(
 
 # Include items routes
 app.include_router(items_router, prefix="/items")
+app.include_router(emails_router, prefix="/emails")
 add_pagination(app)

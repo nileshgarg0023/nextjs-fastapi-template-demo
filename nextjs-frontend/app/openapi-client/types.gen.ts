@@ -22,12 +22,148 @@ export type Body_auth_verify_verify = {
   token: string;
 };
 
+export type ConnectedGmailTriageRequest = {
+  /**
+   * Gmail search query for the messages OpenAI should triage.
+   */
+  search_query?: string;
+  max_results?: number;
+  dry_run?: boolean;
+  high_label?: string;
+  medium_label?: string;
+  low_label?: string;
+  user_focus?: string;
+};
+
 export type ErrorModel = {
   detail:
     | string
     | {
         [key: string]: string;
       };
+};
+
+export type GmailCategory = "primary" | "promotions" | "updates";
+
+export type GmailConnectionStatusResponse = {
+  connected: boolean;
+  email_address?: string | null;
+  categories?: Array<GmailCategory>;
+};
+
+export type GmailConnectUrlResponse = {
+  url: string;
+};
+
+export type GmailMcpTriageRequest = {
+  /**
+   * Google OAuth access token with Gmail read, modify, and label access.
+   */
+  google_access_token: string;
+  /**
+   * Gmail search query for the messages OpenAI should triage.
+   */
+  search_query?: string;
+  max_results?: number;
+  /**
+   * When true, classify and summarize without applying labels.
+   */
+  dry_run?: boolean;
+  high_label?: string;
+  medium_label?: string;
+  low_label?: string;
+  /**
+   * Optional user preference, goals, role, or current focus areas.
+   */
+  user_focus?: string | null;
+};
+
+export type GmailMcpTriageResponse = {
+  result: string;
+};
+
+export type GmailMessageRead = {
+  gmail_id: string;
+  thread_id?: string | null;
+  category: GmailCategory;
+  subject?: string | null;
+  sender?: string | null;
+  received_at?: string | null;
+  snippet?: string | null;
+};
+
+export type GmailSendRequest = {
+  /**
+   * Google OAuth access token with Gmail send access.
+   */
+  access_token: string;
+  to: string;
+  subject: string;
+  body: string;
+  cc?: string | null;
+  bcc?: string | null;
+};
+
+export type GmailSendResponse = {
+  gmail_id: string;
+  thread_id?: string | null;
+};
+
+export type GmailSyncRequest = {
+  /**
+   * Google OAuth access token with Gmail read-only access.
+   */
+  access_token: string;
+  categories?: Array<GmailCategory>;
+  /**
+   * Maximum messages to pull per Gmail category.
+   */
+  max_results?: number | null;
+};
+
+export type GmailSyncResponse = {
+  pulled: number;
+  messages: Array<GmailMessageRead>;
+};
+
+export type GmailWatchRequest = {
+  /**
+   * Google OAuth access token with Gmail read-only access.
+   */
+  access_token: string;
+  categories?: Array<GmailCategory>;
+  /**
+   * Maximum messages to pull per Gmail category.
+   */
+  max_results?: number | null;
+  /**
+   * Google Cloud Pub/Sub topic, e.g. projects/my-project/topics/gmail.
+   */
+  topic_name?: string | null;
+};
+
+export type GmailWatchResponse = {
+  email_address: string;
+  history_id: string;
+  expiration?: string | null;
+  categories: Array<GmailCategory>;
+};
+
+export type GmailWebhookMessage = {
+  data: string;
+  messageId?: string | null;
+  publishTime?: string | null;
+};
+
+export type GmailWebhookPayload = {
+  message: GmailWebhookMessage;
+  subscription?: string | null;
+};
+
+export type GmailWebhookResponse = {
+  processed: boolean;
+  email_address?: string | null;
+  pulled?: number;
 };
 
 export type HTTPValidationError = {
@@ -227,3 +363,73 @@ export type DeleteItemData = {
 export type DeleteItemResponse = unknown;
 
 export type DeleteItemError = HTTPValidationError;
+
+export type SyncGmailMessagesData = {
+  body: GmailSyncRequest;
+};
+
+export type SyncGmailMessagesResponse = GmailSyncResponse;
+
+export type SyncGmailMessagesError = HTTPValidationError;
+
+export type GetGmailConnectUrlResponse = GmailConnectUrlResponse;
+
+export type GetGmailConnectUrlError = unknown;
+
+export type GetGmailStatusResponse = GmailConnectionStatusResponse;
+
+export type GetGmailStatusError = unknown;
+
+export type GmailOauthCallbackData = {
+  query: {
+    code: string;
+    state: string;
+  };
+};
+
+export type GmailOauthCallbackResponse = unknown;
+
+export type GmailOauthCallbackError = HTTPValidationError;
+
+export type TriageGmailWithMcpData = {
+  body: GmailMcpTriageRequest;
+};
+
+export type TriageGmailWithMcpResponse = GmailMcpTriageResponse;
+
+export type TriageGmailWithMcpError = HTTPValidationError;
+
+export type TriageConnectedGmailData = {
+  body: ConnectedGmailTriageRequest;
+};
+
+export type TriageConnectedGmailResponse = GmailMcpTriageResponse;
+
+export type TriageConnectedGmailError = HTTPValidationError;
+
+export type WatchGmailMessagesData = {
+  body: GmailWatchRequest;
+};
+
+export type WatchGmailMessagesResponse = GmailWatchResponse;
+
+export type WatchGmailMessagesError = HTTPValidationError;
+
+export type GmailWebhookData = {
+  body: GmailWebhookPayload;
+  query?: {
+    token?: string | null;
+  };
+};
+
+export type GmailWebhookResponse2 = GmailWebhookResponse;
+
+export type GmailWebhookError = HTTPValidationError;
+
+export type SendGmailMessageData = {
+  body: GmailSendRequest;
+};
+
+export type SendGmailMessageResponse = GmailSendResponse;
+
+export type SendGmailMessageError = HTTPValidationError;

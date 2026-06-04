@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Home, Users2, List } from "lucide-react";
+import { Home, Users2, List, Mail } from "lucide-react";
 import Image from "next/image";
 
 import {
@@ -44,6 +44,12 @@ export default function DashboardLayout({
             className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
           >
             <List className="h-5 w-5" />
+          </Link>
+          <Link
+            href="/dashboard/gmail"
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+          >
+            <Mail className="h-5 w-5" />
           </Link>
           <Link
             href="/customers"

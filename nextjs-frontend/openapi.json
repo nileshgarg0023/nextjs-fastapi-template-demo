@@ -829,6 +829,396 @@
           }
         }
       }
+    },
+    "/emails/sync": {
+      "post": {
+        "tags": [
+          "email"
+        ],
+        "summary": "Sync Gmail Messages",
+        "operationId": "sync_gmail_messages",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GmailSyncRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GmailSyncResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/emails/gmail/connect-url": {
+      "get": {
+        "tags": [
+          "email"
+        ],
+        "summary": "Get Gmail Connect Url",
+        "operationId": "get_gmail_connect_url",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GmailConnectUrlResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/emails/gmail/status": {
+      "get": {
+        "tags": [
+          "email"
+        ],
+        "summary": "Get Gmail Status",
+        "operationId": "get_gmail_status",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GmailConnectionStatusResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/emails/gmail/oauth/callback": {
+      "get": {
+        "tags": [
+          "email"
+        ],
+        "summary": "Gmail Oauth Callback",
+        "operationId": "gmail_oauth_callback",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Code"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "State"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/emails/gmail/triage-mcp": {
+      "post": {
+        "tags": [
+          "email"
+        ],
+        "summary": "Triage Gmail With Mcp",
+        "operationId": "triage_gmail_with_mcp",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GmailMcpTriageRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GmailMcpTriageResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/emails/gmail/triage-connected": {
+      "post": {
+        "tags": [
+          "email"
+        ],
+        "summary": "Triage Connected Gmail",
+        "operationId": "triage_connected_gmail",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConnectedGmailTriageRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GmailMcpTriageResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/emails/gmail/watch": {
+      "post": {
+        "tags": [
+          "email"
+        ],
+        "summary": "Watch Gmail Messages",
+        "operationId": "watch_gmail_messages",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GmailWatchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GmailWatchResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/emails/gmail/webhook": {
+      "post": {
+        "tags": [
+          "email"
+        ],
+        "summary": "Gmail Webhook",
+        "operationId": "gmail_webhook",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GmailWebhookPayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GmailWebhookResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/emails/gmail/send": {
+      "post": {
+        "tags": [
+          "email"
+        ],
+        "summary": "Send Gmail Message",
+        "operationId": "send_gmail_message",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GmailSendRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GmailSendResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -910,6 +1300,50 @@
         ],
         "title": "Body_auth-verify:verify"
       },
+      "ConnectedGmailTriageRequest": {
+        "properties": {
+          "search_query": {
+            "type": "string",
+            "title": "Search Query",
+            "description": "Gmail search query for the messages OpenAI should triage.",
+            "default": "newer_than:1d"
+          },
+          "max_results": {
+            "type": "integer",
+            "maximum": 200.0,
+            "minimum": 1.0,
+            "title": "Max Results",
+            "default": 50
+          },
+          "dry_run": {
+            "type": "boolean",
+            "title": "Dry Run",
+            "default": true
+          },
+          "high_label": {
+            "type": "string",
+            "title": "High Label",
+            "default": "Priority/High"
+          },
+          "medium_label": {
+            "type": "string",
+            "title": "Medium Label",
+            "default": "Priority/Medium"
+          },
+          "low_label": {
+            "type": "string",
+            "title": "Low Label",
+            "default": "Priority/Low"
+          },
+          "user_focus": {
+            "type": "string",
+            "title": "User Focus",
+            "default": "Prioritize direct human requests, legal or finance issues, deadlines, customer issues, action items, and emails with specific dates or times. Promotional emails should usually be low priority."
+          }
+        },
+        "type": "object",
+        "title": "ConnectedGmailTriageRequest"
+      },
       "ErrorModel": {
         "properties": {
           "detail": {
@@ -932,6 +1366,513 @@
           "detail"
         ],
         "title": "ErrorModel"
+      },
+      "GmailCategory": {
+        "type": "string",
+        "enum": [
+          "primary",
+          "promotions",
+          "updates"
+        ],
+        "title": "GmailCategory"
+      },
+      "GmailConnectUrlResponse": {
+        "properties": {
+          "url": {
+            "type": "string",
+            "title": "Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "title": "GmailConnectUrlResponse"
+      },
+      "GmailConnectionStatusResponse": {
+        "properties": {
+          "connected": {
+            "type": "boolean",
+            "title": "Connected"
+          },
+          "email_address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email Address"
+          },
+          "categories": {
+            "items": {
+              "$ref": "#/components/schemas/GmailCategory"
+            },
+            "type": "array",
+            "title": "Categories"
+          }
+        },
+        "type": "object",
+        "required": [
+          "connected"
+        ],
+        "title": "GmailConnectionStatusResponse"
+      },
+      "GmailMcpTriageRequest": {
+        "properties": {
+          "google_access_token": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Google Access Token",
+            "description": "Google OAuth access token with Gmail read, modify, and label access."
+          },
+          "search_query": {
+            "type": "string",
+            "title": "Search Query",
+            "description": "Gmail search query for the messages OpenAI should triage.",
+            "default": "category:primary newer_than:1d"
+          },
+          "max_results": {
+            "type": "integer",
+            "maximum": 200.0,
+            "minimum": 1.0,
+            "title": "Max Results",
+            "default": 50
+          },
+          "dry_run": {
+            "type": "boolean",
+            "title": "Dry Run",
+            "description": "When true, classify and summarize without applying labels.",
+            "default": true
+          },
+          "high_label": {
+            "type": "string",
+            "title": "High Label",
+            "default": "Priority/High"
+          },
+          "medium_label": {
+            "type": "string",
+            "title": "Medium Label",
+            "default": "Priority/Medium"
+          },
+          "low_label": {
+            "type": "string",
+            "title": "Low Label",
+            "default": "Priority/Low"
+          },
+          "user_focus": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Focus",
+            "description": "Optional user preference, goals, role, or current focus areas."
+          }
+        },
+        "type": "object",
+        "required": [
+          "google_access_token"
+        ],
+        "title": "GmailMcpTriageRequest"
+      },
+      "GmailMcpTriageResponse": {
+        "properties": {
+          "result": {
+            "type": "string",
+            "title": "Result"
+          }
+        },
+        "type": "object",
+        "required": [
+          "result"
+        ],
+        "title": "GmailMcpTriageResponse"
+      },
+      "GmailMessageRead": {
+        "properties": {
+          "gmail_id": {
+            "type": "string",
+            "title": "Gmail Id"
+          },
+          "thread_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thread Id"
+          },
+          "category": {
+            "$ref": "#/components/schemas/GmailCategory"
+          },
+          "subject": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subject"
+          },
+          "sender": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sender"
+          },
+          "received_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Received At"
+          },
+          "snippet": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Snippet"
+          }
+        },
+        "type": "object",
+        "required": [
+          "gmail_id",
+          "category"
+        ],
+        "title": "GmailMessageRead"
+      },
+      "GmailSendRequest": {
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Access Token",
+            "description": "Google OAuth access token with Gmail send access."
+          },
+          "to": {
+            "type": "string",
+            "minLength": 1,
+            "title": "To"
+          },
+          "subject": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Subject"
+          },
+          "body": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Body"
+          },
+          "cc": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cc"
+          },
+          "bcc": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bcc"
+          }
+        },
+        "type": "object",
+        "required": [
+          "access_token",
+          "to",
+          "subject",
+          "body"
+        ],
+        "title": "GmailSendRequest"
+      },
+      "GmailSendResponse": {
+        "properties": {
+          "gmail_id": {
+            "type": "string",
+            "title": "Gmail Id"
+          },
+          "thread_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thread Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "gmail_id"
+        ],
+        "title": "GmailSendResponse"
+      },
+      "GmailSyncRequest": {
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Access Token",
+            "description": "Google OAuth access token with Gmail read-only access."
+          },
+          "categories": {
+            "items": {
+              "$ref": "#/components/schemas/GmailCategory"
+            },
+            "type": "array",
+            "title": "Categories"
+          },
+          "max_results": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 50.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Results",
+            "description": "Maximum messages to pull per Gmail category."
+          }
+        },
+        "type": "object",
+        "required": [
+          "access_token"
+        ],
+        "title": "GmailSyncRequest"
+      },
+      "GmailSyncResponse": {
+        "properties": {
+          "pulled": {
+            "type": "integer",
+            "title": "Pulled"
+          },
+          "messages": {
+            "items": {
+              "$ref": "#/components/schemas/GmailMessageRead"
+            },
+            "type": "array",
+            "title": "Messages"
+          }
+        },
+        "type": "object",
+        "required": [
+          "pulled",
+          "messages"
+        ],
+        "title": "GmailSyncResponse"
+      },
+      "GmailWatchRequest": {
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Access Token",
+            "description": "Google OAuth access token with Gmail read-only access."
+          },
+          "categories": {
+            "items": {
+              "$ref": "#/components/schemas/GmailCategory"
+            },
+            "type": "array",
+            "title": "Categories"
+          },
+          "max_results": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 50.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Results",
+            "description": "Maximum messages to pull per Gmail category."
+          },
+          "topic_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Topic Name",
+            "description": "Google Cloud Pub/Sub topic, e.g. projects/my-project/topics/gmail."
+          }
+        },
+        "type": "object",
+        "required": [
+          "access_token"
+        ],
+        "title": "GmailWatchRequest"
+      },
+      "GmailWatchResponse": {
+        "properties": {
+          "email_address": {
+            "type": "string",
+            "title": "Email Address"
+          },
+          "history_id": {
+            "type": "string",
+            "title": "History Id"
+          },
+          "expiration": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expiration"
+          },
+          "categories": {
+            "items": {
+              "$ref": "#/components/schemas/GmailCategory"
+            },
+            "type": "array",
+            "title": "Categories"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email_address",
+          "history_id",
+          "categories"
+        ],
+        "title": "GmailWatchResponse"
+      },
+      "GmailWebhookMessage": {
+        "properties": {
+          "data": {
+            "type": "string",
+            "title": "Data"
+          },
+          "messageId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Messageid"
+          },
+          "publishTime": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Publishtime"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "GmailWebhookMessage"
+      },
+      "GmailWebhookPayload": {
+        "properties": {
+          "message": {
+            "$ref": "#/components/schemas/GmailWebhookMessage"
+          },
+          "subscription": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subscription"
+          }
+        },
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "title": "GmailWebhookPayload"
+      },
+      "GmailWebhookResponse": {
+        "properties": {
+          "processed": {
+            "type": "boolean",
+            "title": "Processed"
+          },
+          "email_address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email Address"
+          },
+          "pulled": {
+            "type": "integer",
+            "title": "Pulled",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "processed"
+        ],
+        "title": "GmailWebhookResponse"
       },
       "HTTPValidationError": {
         "properties": {

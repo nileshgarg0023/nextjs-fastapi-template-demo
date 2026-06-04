@@ -50,6 +50,31 @@ import type {
   DeleteItemData,
   DeleteItemError,
   DeleteItemResponse,
+  SyncGmailMessagesData,
+  SyncGmailMessagesError,
+  SyncGmailMessagesResponse,
+  GetGmailConnectUrlError,
+  GetGmailConnectUrlResponse,
+  GetGmailStatusError,
+  GetGmailStatusResponse,
+  GmailOauthCallbackData,
+  GmailOauthCallbackError,
+  GmailOauthCallbackResponse,
+  TriageGmailWithMcpData,
+  TriageGmailWithMcpError,
+  TriageGmailWithMcpResponse,
+  TriageConnectedGmailData,
+  TriageConnectedGmailError,
+  TriageConnectedGmailResponse,
+  WatchGmailMessagesData,
+  WatchGmailMessagesError,
+  WatchGmailMessagesResponse,
+  GmailWebhookData,
+  GmailWebhookError,
+  GmailWebhookResponse2,
+  SendGmailMessageData,
+  SendGmailMessageError,
+  SendGmailMessageResponse,
 } from "./types.gen";
 
 export const client = createClient(createConfig());
@@ -296,5 +321,149 @@ export const deleteItem = <ThrowOnError extends boolean = false>(
   >({
     ...options,
     url: "/items/{item_id}",
+  });
+};
+
+/**
+ * Sync Gmail Messages
+ */
+export const syncGmailMessages = <ThrowOnError extends boolean = false>(
+  options: OptionsLegacyParser<SyncGmailMessagesData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    SyncGmailMessagesResponse,
+    SyncGmailMessagesError,
+    ThrowOnError
+  >({
+    ...options,
+    url: "/emails/sync",
+  });
+};
+
+/**
+ * Get Gmail Connect Url
+ */
+export const getGmailConnectUrl = <ThrowOnError extends boolean = false>(
+  options?: OptionsLegacyParser<unknown, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetGmailConnectUrlResponse,
+    GetGmailConnectUrlError,
+    ThrowOnError
+  >({
+    ...options,
+    url: "/emails/gmail/connect-url",
+  });
+};
+
+/**
+ * Get Gmail Status
+ */
+export const getGmailStatus = <ThrowOnError extends boolean = false>(
+  options?: OptionsLegacyParser<unknown, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetGmailStatusResponse,
+    GetGmailStatusError,
+    ThrowOnError
+  >({
+    ...options,
+    url: "/emails/gmail/status",
+  });
+};
+
+/**
+ * Gmail Oauth Callback
+ */
+export const gmailOauthCallback = <ThrowOnError extends boolean = false>(
+  options: OptionsLegacyParser<GmailOauthCallbackData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GmailOauthCallbackResponse,
+    GmailOauthCallbackError,
+    ThrowOnError
+  >({
+    ...options,
+    url: "/emails/gmail/oauth/callback",
+  });
+};
+
+/**
+ * Triage Gmail With Mcp
+ */
+export const triageGmailWithMcp = <ThrowOnError extends boolean = false>(
+  options: OptionsLegacyParser<TriageGmailWithMcpData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    TriageGmailWithMcpResponse,
+    TriageGmailWithMcpError,
+    ThrowOnError
+  >({
+    ...options,
+    url: "/emails/gmail/triage-mcp",
+  });
+};
+
+/**
+ * Triage Connected Gmail
+ */
+export const triageConnectedGmail = <ThrowOnError extends boolean = false>(
+  options: OptionsLegacyParser<TriageConnectedGmailData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    TriageConnectedGmailResponse,
+    TriageConnectedGmailError,
+    ThrowOnError
+  >({
+    ...options,
+    url: "/emails/gmail/triage-connected",
+  });
+};
+
+/**
+ * Watch Gmail Messages
+ */
+export const watchGmailMessages = <ThrowOnError extends boolean = false>(
+  options: OptionsLegacyParser<WatchGmailMessagesData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    WatchGmailMessagesResponse,
+    WatchGmailMessagesError,
+    ThrowOnError
+  >({
+    ...options,
+    url: "/emails/gmail/watch",
+  });
+};
+
+/**
+ * Gmail Webhook
+ */
+export const gmailWebhook = <ThrowOnError extends boolean = false>(
+  options: OptionsLegacyParser<GmailWebhookData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    GmailWebhookResponse2,
+    GmailWebhookError,
+    ThrowOnError
+  >({
+    ...options,
+    url: "/emails/gmail/webhook",
+  });
+};
+
+/**
+ * Send Gmail Message
+ */
+export const sendGmailMessage = <ThrowOnError extends boolean = false>(
+  options: OptionsLegacyParser<SendGmailMessageData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    SendGmailMessageResponse,
+    SendGmailMessageError,
+    ThrowOnError
+  >({
+    ...options,
+    url: "/emails/gmail/send",
   });
 };

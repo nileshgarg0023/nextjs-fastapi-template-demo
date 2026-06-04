@@ -52,6 +52,79 @@ make start-frontend
 - **Backend API**: http://localhost:8000
 - **API Documentation**: http://localhost:8000/docs
 
+### Gmail Priority Sorting
+
+The dashboard includes a Gmail priority sorter at:
+
+```bash
+http://localhost:3000/dashboard/gmail
+```
+
+Configure Google OAuth and OpenAI in `fastapi_backend/.env`:
+
+```bash
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+GOOGLE_OAUTH_REDIRECT_URI=http://localhost:8000/emails/gmail/oauth/callback
+OPENAI_API_KEY=your_openai_api_key
+OPENAI_EMAIL_TRIAGE_MODEL=gpt-5
+FRONTEND_URL=http://localhost:3000
+```
+
+Add the redirect URI in Google Cloud Console exactly:
+
+```bash
+http://localhost:8000/emails/gmail/oauth/callback
+```
+
+The app asks Google for Gmail modify access so it can read messages and apply labels. OpenAI does not get Gmail tool access; the backend reads Gmail, asks OpenAI only for priority classification, and applies labels itself.
+
+Manual sorting endpoint used by the UI:
+
+```bash
+POST /emails/gmail/triage-connected
+```
+
+Priority labels are category-aware:
+
+```bash
+Primary/High
+Primary/Medium
+Primary/Low
+Updates/High
+Updates/Medium
+Updates/Low
+Promotions/High
+Promotions/Medium
+Promotions/Low
+```
+
+Promotions default to low, but can be upgraded when there is real urgency, account/payment/legal/security relevance, a near deadline, an important sender, or a match with the user's active focus.
+
+Keep `Dry run` checked to preview labels. Uncheck it only when you want the backend to create/apply Gmail labels.
+
+For latest email events, configure Google Cloud Pub/Sub and set:
+
+```bash
+GMAIL_PUBSUB_TOPIC_NAME=projects/your-google-cloud-project/topics/gmail
+GMAIL_WEBHOOK_TOKEN=change-me
+OPENAI_EMAIL_TRIAGE_ON_WEBHOOK=True
+```
+
+Point the Pub/Sub push subscription at:
+
+```bash
+POST /emails/gmail/webhook?token=change-me
+```
+
+Then call:
+
+```bash
+POST /emails/gmail/watch-connected
+```
+
+Google cannot push webhooks to plain `localhost`; use a public HTTPS tunnel such as ngrok for local webhook testing.
+
 ### Test User Credentials
 
 The setup script automatically creates a test user:
