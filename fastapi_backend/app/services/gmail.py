@@ -1,8 +1,10 @@
 import json
 import logging
 import base64
+import re
 from dataclasses import dataclass
 from email.utils import parsedate_to_datetime
+from html import unescape
 from typing import Any
 from urllib.error import HTTPError
 from urllib.parse import urlencode
@@ -164,7 +166,7 @@ class GmailClient:
             sender=headers.get("from"),
             received_at=_normalize_date(headers.get("date")),
             snippet=data.get("snippet"),
-            body_preview=_extract_body_preview(data.get("payload", {})),
+            body_content=_extract_body_content(data.get("payload", {})),
         )
 
     def _ensure_label(self, label_name: str) -> str:
@@ -236,15 +238,14 @@ def _normalize_date(value: str | None) -> str | None:
         return value
 
 
-def _extract_body_preview(payload: dict[str, Any]) -> str | None:
+def _extract_body_content(payload: dict[str, Any]) -> str | None:
     chunks = list(_extract_text_parts(payload, preferred_mime_type="text/plain"))
     if not chunks:
         chunks = list(_extract_text_parts(payload, preferred_mime_type="text/html"))
     if not chunks:
         return None
 
-    text = " ".join(" ".join(chunk.split()) for chunk in chunks)
-    return text[:1200]
+    return "\n\n".join(_clean_body_text(chunk) for chunk in chunks if chunk.strip())
 
 
 def _extract_text_parts(payload: dict[str, Any], preferred_mime_type: str):
@@ -262,6 +263,13 @@ def _decode_message_body(value: str) -> str:
     return base64.urlsafe_b64decode(padded_value.encode("utf-8")).decode(
         "utf-8", errors="ignore"
     )
+
+
+def _clean_body_text(value: str) -> str:
+    text = re.sub(r"<(script|style).*?</\1>", " ", value, flags=re.I | re.S)
+    text = re.sub(r"<[^>]+>", " ", text)
+    text = unescape(text)
+    return "\n".join(line.strip() for line in text.splitlines() if line.strip())
 
 
 def _read_error_detail(exc: HTTPError) -> str:

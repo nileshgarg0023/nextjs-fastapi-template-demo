@@ -49,7 +49,7 @@ class GmailMessageRead(BaseModel):
     sender: str | None = None
     received_at: str | None = None
     snippet: str | None = None
-    body_preview: str | None = None
+    body_content: str | None = None
 
 
 class ConnectedGmailWatchRequest(BaseModel):

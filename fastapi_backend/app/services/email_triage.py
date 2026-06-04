@@ -1,5 +1,7 @@
 import json
+import re
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from typing import Any
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
@@ -91,7 +93,7 @@ def _build_classification_prompt(
             "sender": message.sender,
             "received_at": message.received_at,
             "snippet": message.snippet,
-            "body_preview": message.body_preview,
+            "body_content": message.body_content,
         }
         for message in messages
     ]
@@ -110,6 +112,15 @@ Priority rules:
 - low: not important, promotional, automated noise, FYI with no action,
   duplicates, or low relevance.
 
+Follow-up rules:
+- Follow-up emails are not automatically high priority.
+- high: follow-up includes a direct ask, blocked work, missed response, or a
+  deadline within 1-2 days.
+- medium: follow-up is relevant but can wait, has no near deadline, or asks for
+  a non-urgent response.
+- low: generic checking-in, networking nudges, sales follow-ups, automated
+  reminders, or follow-ups with no clear action item.
+
 Category weighting:
 - Primary can be high, medium, or low.
 - Updates default to medium. Upgrade to high only when they contain urgent
@@ -123,17 +134,33 @@ Category weighting:
   - low: generic ad, broad marketing, irrelevant newsletter, or routine alert.
 
 Decision inputs:
-- Use subject, sender, received time, Gmail category, snippets/body cues,
+- Use subject, sender, received time, Gmail category, snippets/full body content,
   action items, specific dates/times, and deadline proximity.
 
 Hard low-priority examples:
 - Job alerts, job recommendations, saved search alerts, newsletter digests,
-  promotional deals, marketing campaigns, and automated alerts are low unless
-  the user focus explicitly asks to prioritize that exact category.
+  promotional deals, marketing campaigns, LinkedIn connection invitations, and
+  automated alerts are low unless the user focus explicitly asks to prioritize
+  that exact category.
 - LinkedIn Job Alerts are low by default.
+- LinkedIn connection requests/invitations are low by default.
+- Newsletters, digests, social notifications, receipts, shipping updates,
+  webinar/event marketing, product announcements, and no-reply notifications
+  are low unless they contain account/payment/security/legal risk, a real
+  deadline, or a user-focus match.
+- Calendar/event invitations for meetings that already happened are low unless
+  the message clearly contains a follow-up action item that is still relevant.
+
+Be selective:
+- Most emails are low. Do not mark something high just because it is from a
+  person, contains polite language, or says "follow up".
+- Use high sparingly for items that would cause a problem if ignored today.
 
 User focus:
 {payload.user_focus}
+
+Current date:
+{datetime.now(UTC).date().isoformat()}
 
 Messages:
 {json.dumps(message_data, indent=2)}
@@ -220,6 +247,10 @@ def _apply_deterministic_overrides(
         term in focus
         for term in ["job search", "jobs", "hiring", "recruiter", "career"]
     )
+    prioritize_networking = any(
+        term in focus
+        for term in ["networking", "linkedin", "connections", "partnerships"]
+    )
 
     for classification in classifications:
         message = messages_by_id.get(classification["gmail_id"])
@@ -229,13 +260,42 @@ def _apply_deterministic_overrides(
         subject = (message.subject or "").lower()
         sender = (message.sender or "").lower()
         snippet = (message.snippet or "").lower()
-        body_preview = (message.body_preview or "").lower()
-        combined = " ".join([subject, sender, snippet, body_preview])
+        body_content = (message.body_content or "").lower()
+        combined = " ".join([subject, sender, snippet, body_content])
 
-        if _looks_like_job_alert(combined) and not prioritize_jobs:
+        if _looks_like_past_calendar_event(combined) and not _has_action_or_deadline(
+            combined
+        ):
+            classification["priority"] = "low"
+            classification["reason"] = (
+                "Calendar event already happened and no current action is evident."
+            )
+        elif _looks_like_linkedin_connection_request(combined) and not prioritize_networking:
+            classification["priority"] = "low"
+            classification["reason"] = (
+                "LinkedIn connection invitation; low unless networking is the active focus."
+            )
+        elif _looks_like_job_alert(combined) and not prioritize_jobs:
             classification["priority"] = "low"
             classification["reason"] = (
                 "Automated job alert; low unless job search is the active focus."
+            )
+        elif _looks_like_low_value_automated_email(
+            combined
+        ) and not _has_important_exception(combined):
+            classification["priority"] = "low"
+            classification["reason"] = (
+                "Automated or broadcast email without urgent account, payment, "
+                "security, legal, deadline, or user-focus signal."
+            )
+        elif (
+            classification["priority"] == "high"
+            and _looks_like_generic_follow_up(combined)
+            and not _has_action_or_deadline(combined)
+        ):
+            classification["priority"] = "medium"
+            classification["reason"] = (
+                "Generic follow-up without near deadline or clear blocking action."
             )
 
     return classifications
@@ -255,6 +315,167 @@ def _looks_like_job_alert(text: str) -> bool:
             "quik hire staffing",
         ]
     )
+
+
+def _looks_like_linkedin_connection_request(text: str) -> bool:
+    return "invitations@linkedin.com" in text or any(
+        phrase in text
+        for phrase in [
+            "wants to connect",
+            "i want to connect",
+            "invitation to connect",
+            "connection request",
+            "accept invitation",
+        ]
+    )
+
+
+def _looks_like_past_calendar_event(text: str) -> bool:
+    if not any(
+        phrase in text
+        for phrase in [
+            "updated invitation:",
+            "accepted invitation:",
+            "declined invitation:",
+            "calendar invitation",
+        ]
+    ):
+        return False
+
+    event_date = _extract_event_date(text)
+    if not event_date:
+        return False
+
+    return event_date.date() < datetime.now(UTC).date()
+
+
+def _looks_like_generic_follow_up(text: str) -> bool:
+    return any(
+        phrase in text
+        for phrase in [
+            "just following up",
+            "checking in",
+            "gentle reminder",
+            "wanted to follow up",
+            "circling back",
+            "bumping this",
+            "following up on my previous",
+        ]
+    )
+
+
+def _looks_like_low_value_automated_email(text: str) -> bool:
+    automated_sender = any(
+        phrase in text
+        for phrase in [
+            "noreply@",
+            "no-reply@",
+            "donotreply@",
+            "do-not-reply@",
+            "notifications@",
+            "newsletter@",
+            "digest",
+            "unsubscribe",
+            "view in browser",
+        ]
+    )
+    automated_content = any(
+        phrase in text
+        for phrase in [
+            "weekly roundup",
+            "daily digest",
+            "newsletter",
+            "new post",
+            "someone viewed your profile",
+            "people are talking about",
+            "webinar",
+            "limited time offer",
+            "sale ends",
+            "recommended for you",
+            "order shipped",
+            "delivered",
+            "receipt",
+            "invoice paid",
+            "your statement is ready",
+        ]
+    )
+    return automated_sender or automated_content
+
+
+def _has_important_exception(text: str) -> bool:
+    return any(
+        phrase in text
+        for phrase in [
+            "action required",
+            "payment failed",
+            "past due",
+            "overdue",
+            "security alert",
+            "sign-in attempt",
+            "password",
+            "legal notice",
+            "compliance",
+            "invoice due",
+            "account suspended",
+            "deadline",
+            "expires today",
+            "expires tomorrow",
+            "due today",
+            "due tomorrow",
+        ]
+    )
+
+
+def _has_action_or_deadline(text: str) -> bool:
+    return any(
+        phrase in text
+        for phrase in [
+            "please review",
+            "please confirm",
+            "please send",
+            "please approve",
+            "action required",
+            "need your",
+            "waiting on you",
+            "blocked",
+            "deadline",
+            "due today",
+            "due tomorrow",
+            "by tomorrow",
+            "by eod",
+            "asap",
+            "urgent",
+        ]
+    )
+
+
+def _extract_event_date(text: str) -> datetime | None:
+    match = re.search(
+        r"\b(jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)"
+        r"[a-z]*\s+(\d{1,2}),\s+(\d{4})\b",
+        text,
+        flags=re.IGNORECASE,
+    )
+    if not match:
+        return None
+
+    month_lookup = {
+        "jan": 1,
+        "feb": 2,
+        "mar": 3,
+        "apr": 4,
+        "may": 5,
+        "jun": 6,
+        "jul": 7,
+        "aug": 8,
+        "sep": 9,
+        "sept": 9,
+        "oct": 10,
+        "nov": 11,
+        "dec": 12,
+    }
+    month = month_lookup[match.group(1)[:3].lower()]
+    return datetime(int(match.group(3)), month, int(match.group(2)), tzinfo=UTC)
 
 
 def _extract_response_text(response: dict[str, Any]) -> str:
